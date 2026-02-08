@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import authRoutes from "./routes/auth";
+import protectedRoutes from "./routes/protected";
+import { errorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
 
@@ -14,9 +17,14 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.get("/api/leads", (_req, res) => {
-  res.json({ data: [], message: "Lead retrieval not yet implemented." });
+app.use("/api/auth", authRoutes);
+app.use("/api", protectedRoutes);
+
+app.use((req, res) => {
+  res.status(404).json({ message: `Route ${req.path} not found.` });
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console
