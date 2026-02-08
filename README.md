@@ -67,7 +67,32 @@ Backend `.env`:
 - `JWT_EXPIRES_IN`
 
 Frontend `.env.local`:
-- `NEXT_PUBLIC_API_BASE_URL`
+- `NEXT_PUBLIC_API_URL`
+
+## Production
+- Frontend (Vercel): `https://your-vercel-app.vercel.app`
+- Backend (Railway): `https://your-railway-backend.up.railway.app`
+
+The frontend calls the backend via `NEXT_PUBLIC_API_URL`, and the backend uses
+`DATABASE_URL`, `PORT`, and `JWT_SECRET` from the Railway environment.
+Run `npm run migrate:deploy` in `services/api` during deploys to apply Prisma
+migrations safely.
+
+## Local Development
+1. Create local environment files:
+   ```bash
+   cp .env.example .env
+   cp apps/web/.env.example apps/web/.env.local
+   cp services/api/.env.example services/api/.env
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the stack:
+   ```bash
+   npm run dev
+   ```
 
 ## Roadmap
 - [ ] Authentication (JWT, refresh tokens, RBAC)

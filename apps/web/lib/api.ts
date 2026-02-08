@@ -1,5 +1,8 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!API_BASE_URL) {
+  throw new Error("NEXT_PUBLIC_API_URL is not configured.");
+}
 
 type ApiResponse<T> = {
   data?: T;
@@ -7,21 +10,28 @@ type ApiResponse<T> = {
 };
 
 async function apiRequest<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {})
-    },
-    ...options
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(options?.headers || {})
+      },
+      ...options
+    });
 
-  const payload = (await response.json()) as ApiResponse<T>;
+    const payload = (await response.json()) as ApiResponse<T>;
 
-  if (!response.ok) {
-    throw new Error(payload.message || "Request failed.");
+    if (!response.ok) {
+      throw new Error(payload.message || "Request failed.");
+    }
+
+    return payload.data ?? (payload as T);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("fetch")) {
+      throw new Error("API is unreachable. Please try again later.");
+    }
+    throw error;
   }
-
-  return payload.data ?? (payload as T);
 }
 
 export async function registerUser(input: {
@@ -61,17 +71,24 @@ export async function uploadLeads(params: {
     formData.append("mapping", JSON.stringify(params.mapping));
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/leads/import`, {
-    method: "POST",
-    headers: {
-      ...(params.token ? { Authorization: `Bearer ${params.token}` } : {})
-    },
-    body: formData
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/leads/import`, {
+      method: "POST",
+      headers: {
+        ...(params.token ? { Authorization: `Bearer ${params.token}` } : {})
+      },
+      body: formData
+    });
 
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new Error(payload.message || "Lead upload failed.");
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.message || "Lead upload failed.");
+    }
+    return payload;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("fetch")) {
+      throw new Error("API is unreachable. Please try again later.");
+    }
+    throw error;
   }
-  return payload;
 }

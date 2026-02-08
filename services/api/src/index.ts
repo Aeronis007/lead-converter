@@ -10,8 +10,26 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 4000;
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (!allowedOrigins.length || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    }
+  })
+);
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
@@ -30,5 +48,5 @@ app.use(errorHandler);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console
-  console.log(`API running on http://localhost:${port}`);
+  console.log(`API running on port ${port}`);
 });
