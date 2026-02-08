@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -12,18 +13,24 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <h2 className="text-lg font-semibold">Dashboard</h2>
           </div>
           <nav className="space-y-2 text-sm">
-            <a className="block rounded-lg bg-slate-800/60 px-3 py-2" href="/dashboard">
-              Overview
-            </a>
-            <a className="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800/60" href="/dashboard/leads">
+            <Link
+              className="block rounded-lg bg-slate-800/60 px-3 py-2"
+              href="/dashboard"
+            >
+              Dashboard Overview
+            </Link>
+            <Link
+              className="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800/60"
+              href="/dashboard/leads"
+            >
               Leads
-            </a>
-            <a className="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800/60" href="#">
-              Imports
-            </a>
-            <a className="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800/60" href="#">
-              Settings
-            </a>
+            </Link>
+            <Link
+              className="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800/60"
+              href="/dashboard/leads"
+            >
+              Upload Leads
+            </Link>
           </nav>
         </div>
       </aside>
